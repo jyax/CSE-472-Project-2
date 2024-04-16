@@ -1,4 +1,6 @@
 import * as three from 'three'
+import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+import {uniform } from 'three/nodes'
 
 const scene = new three.Scene();
 const camera = new three.PerspectiveCamera(
@@ -45,7 +47,8 @@ camera.position.z = 5;
 let mouse = new three.Vector2();
 let raycaster = new three.Raycaster();
 const forceRadius = 2;
-const force = 0.5;
+let force = 0.05;
+let sizeValue = 0.12;
 
 function onMouseMove(event) {
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -53,7 +56,14 @@ function onMouseMove(event) {
 }
 
 window.addEventListener('mousemove', onMouseMove, false);
+function updateForce(value) {
+    force = value;
+}
 
+function updateSize(value) {
+    sizeValue = value;
+    particleSystem.material.size = sizeValue;
+}
 function animate() {
     requestAnimationFrame( animate );
 
@@ -73,7 +83,6 @@ function animate() {
 
             if (distance < forceRadius)
             {
-                console.log("Moving particles");
                 positions[i] += dx / distance * force;
                 positions[i + 1] += dy / distance * force;
                 positions[i + 2] += dz / distance * force;
@@ -89,6 +98,13 @@ function animate() {
     // {
     //     positions[i] -= 0.05;
     // }
+
+    const gravity = uniform(- .0098);
+    const gui = new GUI();
+
+    gui.add(gravity, 'value', - .0098, 0, 0.0001).name('gravity');
+    gui.add({ size: sizeValue }, 'size', 0.05, 1, 0.01).name('size').onChange(updateSize);
+    gui.add({ force: force }, 'force', 0.05, 0.5, 0.01).name('force').onChange(updateForce);
 
     renderer.render( scene, camera );
 }
