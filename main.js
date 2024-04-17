@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+import { range, texture, mix, uv, color, positionLocal, timerLocal, SpriteNodeMaterial } from 'three/nodes';
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -13,7 +14,11 @@ const positions = [];
 const colors = [];  // Array to hold the colors for each vertex
 
 const initialColor = { color: '#50C878' };  // Emerald Green color
-const color = new THREE.Color(initialColor.color);
+const color1 = new THREE.Color(initialColor.color);
+
+const smokeColor = mix( color( 0x2c1501 ), color( 0x222222 ), positionLocal.y.mul( 3 ).clamp() );
+const textureLoader = new THREE.TextureLoader();
+const smokeTexture = textureLoader.load('smoke1.png');
 
 for (let i = 0; i < particleCount; i++) {
     positions.push(
@@ -21,7 +26,9 @@ for (let i = 0; i < particleCount; i++) {
         (Math.random() - 0.5) * 10,  // y
         (0)//Math.random() - 0.5) * 10    // z
     );
-    colors.push(color.r, color.g, color.b);  // Push initial color for each particle
+    colors.push(color1.r, color1.g, color1.b);  // Push initial color for each particle
+    colors.push(smokeColor.r, smokeColor.g, smokeColor.b);
+
 }
 
 particles.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
@@ -31,6 +38,18 @@ const material = new THREE.PointsMaterial({
     size: 0.05,
     vertexColors: true
 });
+
+const smokeMaterial = new THREE.PointsMaterial({
+    size: 0.4,
+    vertexColors: true,
+    map: smokeTexture,
+    depthWrite: false,
+    transparent: true,
+
+});
+
+const smokeParticles = new THREE.Points(particles, smokeMaterial);
+scene.add(smokeParticles);
 
 const particleSystem = new THREE.Points(particles, material);
 scene.add(particleSystem);
@@ -70,7 +89,7 @@ function updateGravity(value) {
 
 function updateColor(value) {
     const newColor = new THREE.Color(value);
-    const colors = particleSystem.geometry.attributes.color.array;
+    const colors = particleSystem.geometry.attributes.color1.array;
     for (let i = 0; i < colors.length; i += 3) {
         colors[i] = newColor.r;
         colors[i + 1] = newColor.g;
@@ -108,14 +127,20 @@ function animate() {
     }
     particleSystem.geometry.attributes.position.needsUpdate = true;
 
+
     renderer.render(scene, camera);
 }
 
 animate();
+
 
 const gui = new GUI();
 gui.addColor(initialColor, 'color').name('Particle Color').onChange(updateColor);
 gui.add({ gravity: gravity }, 'gravity', -0.0098, 0, 0.0001).name('Gravity').onChange(updateGravity);
 gui.add({ size: sizeValue }, 'size', 0.05, 1, 0.01).name('Size').onChange(updateSize);
 gui.add({ force: mouseForce }, 'force', 0.05, 0.5, 0.01).name('Force').onChange(updateForce);
-gui.add( { radius: mouseRadius}, 'radius', 1, 5, 0.5).name('Mouse Radius').onChange(updateMouseRadius);
+gui.add({ radius: mouseRadius }, 'radius', 1, 5, 0.5).name('Mouse Radius').onChange(updateMouseRadius);
+const smokeParams = { enabled: true };
+gui.add(smokeParams, 'enabled').name('Enable Smoke').onChange(function (value) {
+    smokeParticles.visible = value;
+});
