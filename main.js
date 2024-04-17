@@ -15,7 +15,7 @@ for (let i = 0; i < particleCount; i++) {
     positions.push(
         (Math.random() - 0.5) * 10,   // x
         (Math.random() - 0.5) * 10,  // y
-        (Math.random() - 0.5) * 10    // z
+        (0)//Math.random() - 0.5) * 10    // z
     );
 }
 
@@ -33,8 +33,8 @@ camera.position.z = 5;
 
 let mouse = new THREE.Vector2();
 let raycaster = new THREE.Raycaster();
-const forceRadius = 2;
-let force = 0.05;
+let mouseRadius = 2;
+let mouseForce = 0.05;
 let sizeValue = 0.1;
 let gravity = -0.0098;  // Initial gravity value
 
@@ -46,7 +46,11 @@ function onMouseMove(event) {
 window.addEventListener('mousemove', onMouseMove, false);
 
 function updateForce(value) {
-    force = value;
+    mouseForce = value;
+}
+
+function updateMouseRadius(value) {
+    mouseRadius = value;
 }
 
 function updateSize(value) {
@@ -57,6 +61,7 @@ function updateSize(value) {
 function updateGravity(value) {
     gravity = value;
 }
+
 
 function animate() {
     requestAnimationFrame(animate);
@@ -72,10 +77,10 @@ function animate() {
             let dz = positions[i + 2] - intersects[0].point.z;
             let distance = Math.sqrt(dx ** 2 + dy ** 2 + dz ** 2);
 
-            if (distance < forceRadius) {
-                positions[i] += dx / distance * force;
-                positions[i + 1] += dy / distance * force;
-                positions[i + 2] += dz / distance * force;
+            if (distance < mouseRadius) {
+                positions[i] += dx / distance * mouseForce;
+                positions[i + 1] += dy / distance * mouseForce;
+                positions[i + 2] += dz / distance * mouseForce;
             }
         }
         particleSystem.geometry.attributes.position.needsUpdate = true;
@@ -96,4 +101,5 @@ animate();
 const gui = new GUI();
 gui.add({ gravity: gravity }, 'gravity', -0.0098, 0, 0.0001).name('Gravity').onChange(updateGravity);
 gui.add({ size: sizeValue }, 'size', 0.05, 1, 0.01).name('Size').onChange(updateSize);
-gui.add({ force: force }, 'force', 0.05, 0.5, 0.01).name('Force').onChange(updateForce);
+gui.add({ force: mouseForce }, 'force', 0.05, 0.5, 0.01).name('Force').onChange(updateForce);
+gui.add( { radius: mouseRadius}, 'radius', 1, 5, 0.5).name('Mouse Radius').onChange(updateMouseRadius);
