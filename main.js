@@ -25,6 +25,7 @@ gui.add({ radius: mouseRadius }, 'radius', 0.25, 2.5, 0.25).name('Mouse Radius')
 const smokeParams = { enabled: true };
 gui.add(smokeParams, 'enabled').name('Enable Smoke').onChange(function (value) {
     smokeParticles.visible = value;
+});
 
 
 // Scene Management
@@ -152,5 +153,5 @@ function animate() {
 
     renderer.render(scene, camera);
 }
-
 animate();
+    
