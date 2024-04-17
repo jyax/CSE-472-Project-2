@@ -90,13 +90,12 @@ function animate() {
         for (let i = 0; i < positions.length; i += 3) {
             let dx = positions[i] - intersects[0].point.x;
             let dy = positions[i + 1] - intersects[0].point.y;
-            let dz = positions[i + 2] - intersects[0].point.z;
-            let distance = Math.sqrt(dx ** 2 + dy ** 2 + dz ** 2);
+            let distance = Math.sqrt(dx ** 2 + dy ** 2);
 
             if (distance < mouseRadius) {
                 positions[i] += dx / distance * mouseForce;
                 positions[i + 1] += dy / distance * mouseForce;
-                positions[i + 2] += dz / distance * mouseForce;
+                positions[i + 2] += 0;
             }
         }
         particleSystem.geometry.attributes.position.needsUpdate = true;
