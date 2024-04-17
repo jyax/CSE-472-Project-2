@@ -41,8 +41,8 @@ let mouse = new THREE.Vector2();
 let raycaster = new THREE.Raycaster();
 let mouseRadius = 2;
 let mouseForce = 0.05;
-let sizeValue = 0.1;
-let gravity = -0.0098;  // Initial gravity value
+let sizeValue = 0.04;
+let gravity = -0.0033;  // Initial gravity value
 
 function onMouseMove(event) {
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
