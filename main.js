@@ -37,7 +37,7 @@ document.body.appendChild(renderer.domElement);
 for (let i = 0; i < particleCount; i++) {
     positions.push(
         (Math.random() - 0.5) * 10, // X
-        (Math.random() - 0.5) * 10, // Y
+        (Math.random() - 0.5) * 7.6, // Y
         0                           // Z
     );
     colors.push(color.r, color.g, color.b);
@@ -93,6 +93,14 @@ function updateColor(value) {
     particleSystem.geometry.attributes.color.needsUpdate = true;
 }
 
+function onWindowResize(event) {
+    const { innerWidth, innerHeight } = window
+
+    camera.aspect = innerWidth / innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize( innerWidth, innerHeight);
+}
+
 function animate() {
     requestAnimationFrame(animate);
 
@@ -108,7 +116,7 @@ function animate() {
 
             if (distance < mouseRadius) {
                 positions[i] += dx / distance * mouseForce;
-                if (positions[i + 1] += dy / distance * mouseForce > -3.82) {
+                if (positions[i + 1] + dy / distance * mouseForce > -3.8) {
                     positions[i + 1] += dy / distance * mouseForce;
                 }
                 positions[i + 2] += 0;
@@ -121,8 +129,12 @@ function animate() {
 
     const posArray = particleSystem.geometry.attributes.position.array;
     for (let i = 1; i < posArray.length; i += 3) {
-        if (posArray[i] > -3.82) {
+        if (posArray[i] > -3.8) {
             posArray[i] += gravity;
+        }
+        if (posArray[i] < -3.81) {
+            posArray[i] = 3.82;
+            posArray[i-1] = (Math.random() - 0.5) * 10
         }
     }
     particleSystem.geometry.attributes.position.needsUpdate = true;
